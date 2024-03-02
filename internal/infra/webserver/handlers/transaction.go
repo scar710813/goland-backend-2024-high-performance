@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
+	db := r.Context().Value("DB").(*sql.DB)
 
 	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil || userId < 1 || userId > 5 {
@@ -35,6 +37,7 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, err := NewTransactionUseCase(
+		db,
 		validTransaction.Valor,
 		validTransaction.Tipo,
 		validTransaction.Descricao,
@@ -68,15 +71,10 @@ func TransactionValidator(value int64, tipo string, description string) (*dto.Tr
 	}, nil
 }
 
-func NewTransactionUseCase(valor int64, tipo string, descricao string, userId int64) (*dto.TransactionOutputDTO, error) {
-	db, err := database.NewMySQLStorage()
-	if err != nil {
-		return nil, err
-	}
-
+func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao string, userId int64) (*dto.TransactionOutputDTO, error) {
 	valueInCents := valor * 100
 
-	err = database.CreateTransaction(db, &dto.TransactionInputDTO{
+	err := database.CreateTransaction(db, &dto.TransactionInputDTO{
 		Valor:     valueInCents,
 		Tipo:      tipo,
 		Descricao: descricao,
