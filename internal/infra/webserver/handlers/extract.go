@@ -50,7 +50,7 @@ func NewExtractUseCase(db *sql.DB, userId int64) (*dto.ExtractOutputDTO, error) 
 		return nil, err
 	}
 
-	balance, err := database.GetBalanceByUserId(db, userId)
+	balance, err := database.GetBalanceAndLimitByUserId(db, userId)
 	if err != nil {
 		return nil, err
 	}
