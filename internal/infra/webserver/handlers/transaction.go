@@ -14,18 +14,6 @@ import (
 
 func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	dbValue := r.Context().Value("DB")
-	if dbValue == nil {
-		http.Error(w, "Conexão do banco de dados não encontrada no contexto", http.StatusInternalServerError)
-		return
-	}
-
-	db, ok := dbValue.(*sql.DB)
-	if !ok {
-		http.Error(w, "Valor no contexto não pode ser convertido para *sql.DB", http.StatusInternalServerError)
-		return
-	}
-
 	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil || userId < 1 || userId > 5 {
 		w.WriteHeader(http.StatusNotFound)
@@ -43,6 +31,18 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 	validTransaction, err := validators.TransactionValidator(transaction.Valor, transaction.Tipo, transaction.Descricao)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	dbValue := r.Context().Value("DB")
+	if dbValue == nil {
+		http.Error(w, "Conexão do banco de dados não encontrada no contexto", http.StatusInternalServerError)
+		return
+	}
+
+	db, ok := dbValue.(*sql.DB)
+	if !ok {
+		http.Error(w, "Valor no contexto não pode ser convertido para *sql.DB", http.StatusInternalServerError)
 		return
 	}
 
