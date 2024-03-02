@@ -7,8 +7,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/kleytonsolinho/rinha-de-backend-2024-q1/internal/infra/database"
-	"github.com/kleytonsolinho/rinha-de-backend-2024-q1/internal/infra/dto"
+	usecase "github.com/kleytonsolinho/rinha-de-backend-2024-q1/internal/domain/use-case"
 )
 
 func ExtractHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +32,7 @@ func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := NewExtractUseCase(db, userId)
+	result, err := usecase.NewExtractUseCase(db, userId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -42,21 +41,4 @@ func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
-}
-
-func NewExtractUseCase(db *sql.DB, userId int64) (*dto.ExtractOutputDTO, error) {
-	transactions, err := database.GetLastTransactionsByUserId(db, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	balance, err := database.GetBalanceAndLimitByUserId(db, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	return &dto.ExtractOutputDTO{
-		Balance:          *balance,
-		LastTransactions: transactions,
-	}, nil
 }
