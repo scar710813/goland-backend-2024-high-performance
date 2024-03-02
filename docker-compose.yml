@@ -6,8 +6,14 @@ services:
     container_name: api01
     hostname: api01
     platform: linux/amd64
-    ports:
-      - 8081:8080
+    restart: unless-stopped
+    ulimits:
+      nproc: 1000000
+      nofile:
+        soft: 1000000
+        hard: 1000000
+    networks:
+      - default
     environment:
       - DB_HOSTNAME=db
     depends_on:
@@ -16,7 +22,7 @@ services:
       resources:
         limits:
           cpus: "0.6"
-          memory: "200MB"
+          memory: "180MB"
 
    api02:
     <<: *api 
@@ -24,8 +30,6 @@ services:
     hostname: api02
     environment:
       - DB_HOSTNAME=db
-    ports:
-      - "8082:8080"
 
    nginx:
     container_name: nginx
@@ -40,12 +44,14 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.17"
-          memory: "10MB"
+          cpus: "0.1"
+          memory: "50MB"
    db:
     image: mysql:5.7
     container_name: mysql
-    restart: always
+    restart: unless-stopped
+    networks:
+      - default
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -58,7 +64,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.13"
+          cpus: "0.2"
           memory: "140MB"
 
 networks:
