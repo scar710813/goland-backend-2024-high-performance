@@ -31,6 +31,8 @@ func NewMySQLStorage() (*sql.DB, error) {
 
 func CreateTransaction(db *sql.DB, transaction *dto.TransactionInputDTO) error {
 	query := "INSERT INTO transacoes (valor, tipo, descricao, cliente_id, realizado_em) VALUES (?, ?, ?, ?, ?)"
+	queryCreditBalance := "UPDATE clientes SET saldo = saldo + ? WHERE id = ?"
+	queryDebitBalance := "UPDATE clientes SET saldo = saldo - ? WHERE id = ?"
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
@@ -45,44 +47,58 @@ func CreateTransaction(db *sql.DB, transaction *dto.TransactionInputDTO) error {
 		return err
 	}
 
+	if transaction.Tipo == "c" {
+		stmt, err = db.Prepare(queryCreditBalance)
+		if err != nil {
+			log.Printf("error on prepare statement: %v", err)
+			return err
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(transaction.Valor, transaction.ClienteID)
+		if err != nil {
+			log.Printf("error on query row: %v", err)
+			return err
+		}
+	} else {
+		stmt, err = db.Prepare(queryDebitBalance)
+		if err != nil {
+			log.Printf("error on prepare statement: %v", err)
+			return err
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(transaction.Valor, transaction.ClienteID)
+		if err != nil {
+			log.Printf("error on query row: %v", err)
+			return err
+		}
+	}
+
 	return nil
 }
 
-func GetBalance(db *sql.DB, userId int64) (int64, error) {
-	query := "SELECT SUM(valor) FROM transacoes WHERE valor IS NOT NULL and cliente_id = ? and tipo = 'c'"
-	query2 := "SELECT SUM(valor) FROM transacoes WHERE valor IS NOT NULL and cliente_id = ? and tipo = 'd'"
+func GetBalanceByUserId(db *sql.DB, userId int64) (*dto.Balance, error) {
+	query := "SELECT saldo, limite FROM clientes WHERE cliente_id = ?"
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
 		log.Printf("error on prepare statement: %v", err)
-		return 0, err
+		return nil, err
 	}
 	defer stmt.Close()
 
-	var totalCredits sql.NullInt64
-	err = stmt.QueryRow(userId).Scan(&totalCredits)
+	var balance dto.Balance
+	row := stmt.QueryRow(userId)
+	err = row.Scan(&balance.Total, &balance.Limit)
 	if err != nil {
-		log.Printf("error on query row: %v", err)
-		return 0, err
+		log.Printf("error on scan row: %v", err)
+		return nil, err
 	}
 
-	stmt2, err := db.Prepare(query2)
-	if err != nil {
-		log.Printf("error on prepare statement: %v", err)
-		return 0, err
-	}
-	defer stmt2.Close()
+	balance.CreatedAt = time.Now().Format("2006-01-02T15:04:05.999999Z")
 
-	var totalDebits sql.NullInt64
-	err = stmt2.QueryRow(userId).Scan(&totalDebits)
-	if err != nil {
-		log.Printf("error on query row: %v", err)
-		return 0, err
-	}
-
-	balance := totalCredits.Int64 - totalDebits.Int64
-
-	return balance, nil
+	return &balance, nil
 }
 
 func GetLimitByUserId(db *sql.DB, id int64) (int64, error) {
