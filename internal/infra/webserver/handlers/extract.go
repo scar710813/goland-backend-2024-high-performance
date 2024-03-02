@@ -27,7 +27,7 @@ func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 
 	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil || userId < 1 || userId > 5 {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode("User ID is invalid")
 		return
 	}
