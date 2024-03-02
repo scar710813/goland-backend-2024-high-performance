@@ -14,7 +14,7 @@ func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao strin
 		return nil, err
 	}
 
-	if tipo == "d" && valor >= (balance.Total+balance.Limit) {
+	if tipo == "d" && valor > (balance.Total+balance.Limit) {
 		return nil, errors.New("saldo insuficiente")
 	}
 
