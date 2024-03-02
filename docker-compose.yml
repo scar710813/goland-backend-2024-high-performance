@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
    api01:
-    image: kleytonsolinho/rinha-de-backend-2024-q1
+    image: kleytonsolinho/rinha-de-backend-2024-q1:latest
     container_name: api01
     platform: linux/amd64
     ports:
