@@ -4,7 +4,6 @@ CREATE TABLE clientes (
   limite INTEGER NOT NULL,
   saldo INTEGER DEFAULT 0
 );
-
 CREATE TABLE transacoes (
   id SERIAL PRIMARY KEY,
   valor INTEGER,
@@ -13,13 +12,6 @@ CREATE TABLE transacoes (
   cliente_id INTEGER REFERENCES clientes(id),
   realizado_em VARCHAR(27)
 );
-
-ALTER TABLE
-  transacoes
-SET
-  (autovacuum_enabled = false);
-
-
 INSERT INTO clientes (nome, limite, saldo)
   VALUES
     ('o barato sai caro', 1000 * 100, 0),
