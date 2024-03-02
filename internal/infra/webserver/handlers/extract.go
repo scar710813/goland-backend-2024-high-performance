@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 
 func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
+	db := r.Context().Value("DB").(*sql.DB)
 
 	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil || userId < 1 || userId > 5 {
@@ -21,7 +23,7 @@ func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := NewExtractUseCase(userId)
+	result, err := NewExtractUseCase(db, userId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -32,11 +34,7 @@ func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func NewExtractUseCase(userId int64) (*dto.ExtractOutputDTO, error) {
-	db, err := database.NewMySQLStorage()
-	if err != nil {
-		return nil, err
-	}
+func NewExtractUseCase(db *sql.DB, userId int64) (*dto.ExtractOutputDTO, error) {
 
 	transactions, err := database.GetLastTransactionsByUserId(db, userId)
 	if err != nil {
