@@ -1,7 +1,7 @@
 TAG=latest
 
 build:
-	docker build -t rinha-de-backend-2024-q1 ./docker/
+	docker build --platform linux/amd64 -t rinha-de-backend-2024-q1 ./docker/
 login:
 	docker login
 tag: login
