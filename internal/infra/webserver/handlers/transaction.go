@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -35,7 +34,7 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := NewTransaction(
+	result, err := NewTransactionUseCase(
 		validTransaction.Valor,
 		validTransaction.Tipo,
 		validTransaction.Descricao,
@@ -69,23 +68,15 @@ func TransactionValidator(value int64, tipo string, description string) (*dto.Tr
 	}, nil
 }
 
-func NewTransaction(valor int64, tipo string, descricao string, userId int64) (*dto.TransactionOutputDTO, error) {
-	db, err := database.NewPostgresStorage()
+func NewTransactionUseCase(valor int64, tipo string, descricao string, userId int64) (*dto.TransactionOutputDTO, error) {
+	db, err := database.NewMySQLStorage()
 	if err != nil {
 		return nil, err
 	}
 
 	valueInCents := valor * 100
 
-	fmt.Println(&dto.TransactionInputDTO{
-		Valor:     valueInCents,
-		Tipo:      tipo,
-		Descricao: descricao,
-		ClienteID: userId,
-	})
-
-	var transactionCreated *dto.TransactionDTO
-	transactionCreated, err = db.CreateTransaction(&dto.TransactionInputDTO{
+	err = database.CreateTransaction(db, &dto.TransactionInputDTO{
 		Valor:     valueInCents,
 		Tipo:      tipo,
 		Descricao: descricao,
@@ -95,10 +86,18 @@ func NewTransaction(valor int64, tipo string, descricao string, userId int64) (*
 		return nil, err
 	}
 
-	fmt.Println(transactionCreated)
+	balance, err := database.GetBalance(db, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	limit, err := database.GetLimitByUserId(db, userId)
+	if err != nil {
+		return nil, err
+	}
 
 	return &dto.TransactionOutputDTO{
-		Limite: 10000,
-		Saldo:  10000 - valueInCents,
+		Limite: limit,
+		Saldo:  balance,
 	}, nil
 }
