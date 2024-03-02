@@ -79,7 +79,7 @@ func CreateTransaction(db *sql.DB, transaction *dto.TransactionInputDTO) error {
 }
 
 func GetBalanceByUserId(db *sql.DB, userId int64) (*dto.Balance, error) {
-	query := "SELECT saldo, limite FROM clientes WHERE cliente_id = ?"
+	query := "SELECT saldo, limite FROM clientes WHERE id = ?"
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
