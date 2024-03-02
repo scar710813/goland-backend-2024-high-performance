@@ -45,7 +45,6 @@ services:
    db:
     image: mysql:5.7
     container_name: mysql
-    hostname: db
     restart: always
     platform: linux/amd64
     environment:
