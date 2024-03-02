@@ -51,7 +51,7 @@ services:
     platform: linux/amd64
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: rinha-de-backend-mysql
+      MYSQL_DATABASE: mysql-db
       MYSQL_PASSWORD: root
     ports:
       - 3306:3306
