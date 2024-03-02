@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,7 +15,22 @@ import (
 
 func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	db := r.Context().Value("DB").(*sql.DB)
+
+	// Obter a conexão do banco de dados do contexto
+	dbValue := r.Context().Value("DB")
+	if dbValue == nil {
+		http.Error(w, "Conexão do banco de dados não encontrada no contexto", http.StatusInternalServerError)
+		return
+	}
+
+	// Converter o valor para *sql.DB
+	db, ok := dbValue.(*sql.DB)
+	if !ok {
+		http.Error(w, "Valor no contexto não pode ser convertido para *sql.DB", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Manipulador de extração recebeu a conexão do banco de dados")
 
 	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil || userId < 1 || userId > 5 {
