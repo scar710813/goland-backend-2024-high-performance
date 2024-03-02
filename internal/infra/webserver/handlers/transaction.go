@@ -86,12 +86,12 @@ func TransactionValidator(value int64, tipo string, description string) (*dto.Tr
 }
 
 func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao string, userId int64) (*dto.TransactionOutputDTO, error) {
-	balance, err := database.GetBalanceByUserId(db, userId)
+	balance, err := database.GetBalanceAndLimitByUserId(db, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	if tipo == "d" && valor > balance.Total {
+	if tipo == "d" && valor > (balance.Total+balance.Limit) {
 		return nil, errors.New("saldo insuficiente")
 	}
 
@@ -105,18 +105,8 @@ func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao strin
 		return nil, err
 	}
 
-	balance, err = database.GetBalanceByUserId(db, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	limit, err := database.GetLimitByUserId(db, userId)
-	if err != nil {
-		return nil, err
-	}
-
 	return &dto.TransactionOutputDTO{
-		Limite: limit,
+		Limite: balance.Limit,
 		Saldo:  balance.Total,
 	}, nil
 }
