@@ -18,6 +18,7 @@ INSERT INTO clientes (nome, limite)
     ('les cruders', 10000 * 100),
     ('padaria joia de cocaia', 100000 * 100),
     ('kid mais', 5000 * 100);
+SET GLOBAL max_connections = 500;
 
 DO $$
 BEGIN
