@@ -43,7 +43,7 @@ services:
           cpus: "0.17"
           memory: "10MB"
    db:
-    image: mysql:5.7
+    image: mysql:latest
     container_name: mysql
     hostname: db
     restart: always
