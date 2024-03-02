@@ -3,7 +3,8 @@ CREATE TABLE transacoes (
   valor INTEGER,
   tipo CHAR(1) CHECK (type IN ('c', 'd')),
   descricao VARCHAR(10),
-  cliente_id INTEGER REFERENCES clientes(id)
+  cliente_id INTEGER REFERENCES clientes(id),
+  realizado_em VARCHAR(27)
 );
 CREATE TABLE clientes (
   id SERIAL PRIMARY KEY,
@@ -18,7 +19,8 @@ BEGIN
     valor INTEGER,
     tipo CHAR(1) CHECK (type IN ('c', 'd')),
     descricao VARCHAR(10),
-    cliente_id INTEGER REFERENCES clientes(id)
+    cliente_id INTEGER REFERENCES clientes(id),
+    realizado_em VARCHAR(27)
   );
   CREATE TABLE clientes (
     id SERIAL PRIMARY KEY,
