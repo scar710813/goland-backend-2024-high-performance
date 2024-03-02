@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  db:
+    container_name: postgres-rinha-de-backend-2024-q1
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rinha_de_backend_2024_q1
+      POSTGRES_SSL: off
+    ports:
+      - "5432:5432"
