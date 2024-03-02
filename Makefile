@@ -1,4 +1,4 @@
-TAG=$(shell git log -1 --format=%h)
+TAG=latest
 
 build:
 	docker build -t rinha-de-backend-2024-q1 ./docker/
