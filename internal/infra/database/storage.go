@@ -15,7 +15,7 @@ type Storage interface {
 }
 
 func NewMySQLStorage() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/rinha-de-backend-mysql?parseTime=true")
+	db, err := sql.Open("mysql", "root:root@tcp(db:3306)/rinha-de-backend-mysql?parseTime=true")
 	if err != nil {
 		log.Printf("error on open connection: %v", err)
 		return nil, err
