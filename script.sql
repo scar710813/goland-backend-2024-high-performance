@@ -1,3 +1,9 @@
+CREATE TABLE clientes (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  limite INTEGER NOT NULL
+);
+
 CREATE TABLE transacoes (
   id SERIAL PRIMARY KEY,
   valor INTEGER,
@@ -6,11 +12,13 @@ CREATE TABLE transacoes (
   cliente_id INTEGER REFERENCES clientes(id),
   realizado_em VARCHAR(27)
 );
-CREATE TABLE clientes (
-  id SERIAL PRIMARY KEY,
-  nome VARCHAR(100) NOT NULL,
-  limite INTEGER NOT NULL
-);
+
+ALTER TABLE
+  transacoes
+SET
+  (autovacuum_enabled = false);
+
+
 INSERT INTO clientes (nome, limite)
   VALUES
     ('o barato sai caro', 1000 * 100),
