@@ -1,14 +1,14 @@
 version: '3'
 
 services:
-  db:
-    container_name: postgres-rinha-de-backend-2024-q1
-    image: postgres:latest
+   mysql:
+    image: mysql:5.7
+    container_name: rinha-de-backend-2024-q1-mysql
     restart: always
+    platform: linux/amd64
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: rinha_de_backend_2024_q1
-      POSTGRES_SSL: off
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: rinha-de-backend-mysql
+      MYSQL_PASSWORD: root
     ports:
-      - "5432:5432"
+      - 3306:3306
