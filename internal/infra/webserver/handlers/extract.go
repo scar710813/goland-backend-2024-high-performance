@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/kleytonsolinho/rinha-de-backend-2024-q1/internal/infra/database"
@@ -51,24 +50,13 @@ func NewExtractUseCase(db *sql.DB, userId int64) (*dto.ExtractOutputDTO, error) 
 		return nil, err
 	}
 
-	balance, err := database.GetBalance(db, userId)
+	balance, err := database.GetBalanceByUserId(db, userId)
 	if err != nil {
 		return nil, err
-	}
-
-	limit, err := database.GetLimitByUserId(db, userId)
-	if err != nil {
-		return nil, err
-	}
-
-	saldo := dto.Balance{
-		Total:     balance,
-		CreatedAt: time.Now().Format("2006-01-02T15:04:05.999999Z"),
-		Limit:     limit,
 	}
 
 	return &dto.ExtractOutputDTO{
-		Balance:          saldo,
+		Balance:          *balance,
 		LastTransactions: transactions,
 	}, nil
 }
