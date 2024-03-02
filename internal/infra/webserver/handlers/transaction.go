@@ -25,7 +25,6 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Valor no contexto não pode ser convertido para *sql.DB", http.StatusInternalServerError)
 		return
 	}
-	defer db.Close()
 
 	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil || userId < 1 || userId > 5 {
