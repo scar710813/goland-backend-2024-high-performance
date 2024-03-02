@@ -12,8 +12,14 @@ import (
 
 func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	dbValue := r.Context().Value("DB")
+	userId, err := strconv.ParseInt(id, 10, 64)
+	if err != nil || userId < 1 || userId > 5 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode("User ID is invalid")
+		return
+	}
 
+	dbValue := r.Context().Value("DB")
 	if dbValue == nil {
 		http.Error(w, "Conexão do banco de dados não encontrada no contexto", http.StatusInternalServerError)
 		return
@@ -22,13 +28,6 @@ func ExtractHandler(w http.ResponseWriter, r *http.Request) {
 	db, ok := dbValue.(*sql.DB)
 	if !ok {
 		http.Error(w, "Valor no contexto não pode ser convertido para *sql.DB", http.StatusInternalServerError)
-		return
-	}
-
-	userId, err := strconv.ParseInt(id, 10, 64)
-	if err != nil || userId < 1 || userId > 5 {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode("User ID is invalid")
 		return
 	}
 
