@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -14,7 +15,21 @@ import (
 
 func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	db := r.Context().Value("DB").(*sql.DB)
+	// Obter a conexão do banco de dados do contexto
+	dbValue := r.Context().Value("DB")
+	if dbValue == nil {
+		http.Error(w, "Conexão do banco de dados não encontrada no contexto", http.StatusInternalServerError)
+		return
+	}
+
+	// Converter o valor para *sql.DB
+	db, ok := dbValue.(*sql.DB)
+	if !ok {
+		http.Error(w, "Valor no contexto não pode ser convertido para *sql.DB", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Manipulador de extração recebeu a conexão do banco de dados")
 
 	userId, err := strconv.ParseInt(id, 10, 64)
 	if err != nil || userId < 1 || userId > 5 {
@@ -72,10 +87,9 @@ func TransactionValidator(value int64, tipo string, description string) (*dto.Tr
 }
 
 func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao string, userId int64) (*dto.TransactionOutputDTO, error) {
-	valueInCents := valor * 100
 
 	err := database.CreateTransaction(db, &dto.TransactionInputDTO{
-		Valor:     valueInCents,
+		Valor:     valor,
 		Tipo:      tipo,
 		Descricao: descricao,
 		ClienteID: userId,
