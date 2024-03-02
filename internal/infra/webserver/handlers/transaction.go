@@ -54,6 +54,10 @@ func TransactionHandler(w http.ResponseWriter, r *http.Request) {
 		userId,
 	)
 	if err != nil {
+		if err.Error() == "saldo insuficiente" {
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			return
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -82,8 +86,16 @@ func TransactionValidator(value int64, tipo string, description string) (*dto.Tr
 }
 
 func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao string, userId int64) (*dto.TransactionOutputDTO, error) {
+	balance, err := database.GetBalanceByUserId(db, userId)
+	if err != nil {
+		return nil, err
+	}
 
-	err := database.CreateTransaction(db, &dto.TransactionInputDTO{
+	if tipo == "d" && valor > balance.Total {
+		return nil, errors.New("saldo insuficiente")
+	}
+
+	err = database.CreateTransaction(db, &dto.TransactionInputDTO{
 		Valor:     valor,
 		Tipo:      tipo,
 		Descricao: descricao,
@@ -93,7 +105,7 @@ func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao strin
 		return nil, err
 	}
 
-	balance, err := database.GetBalance(db, userId)
+	balance, err = database.GetBalanceByUserId(db, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -105,6 +117,6 @@ func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao strin
 
 	return &dto.TransactionOutputDTO{
 		Limite: limit,
-		Saldo:  balance,
+		Saldo:  balance.Total,
 	}, nil
 }
