@@ -3,7 +3,6 @@ version: "3.5"
 services:
    api01: &api
     image: kleytonsolinho/rinha-de-backend-2024-q1:latest
-    container_name: api01
     hostname: api01
     platform: linux/amd64
     restart: unless-stopped
@@ -26,10 +25,7 @@ services:
 
    api02:
     <<: *api 
-    container_name: api02
     hostname: api02
-    environment:
-      - DB_HOSTNAME=db
 
    nginx:
     container_name: nginx
