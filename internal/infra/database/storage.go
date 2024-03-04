@@ -31,8 +31,11 @@ func NewMySQLStorage() (*sql.DB, error) {
 
 func CreateTransaction(db *sql.DB, transaction *dto.TransactionInputDTO) error {
 	query := "INSERT INTO transacoes (valor, tipo, descricao, cliente_id, realizado_em) VALUES (?, ?, ?, ?, ?)"
-	queryCreditBalance := "UPDATE clientes SET saldo = saldo + ? WHERE id = ?"
-	queryDebitBalance := "UPDATE clientes SET saldo = saldo - ? WHERE id = ?"
+	queryUpdateBalance := "UPDATE clientes SET saldo = saldo + ? WHERE id = ?"
+
+	if transaction.Tipo == "d" {
+		transaction.Valor = transaction.Valor * -1
+	}
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
@@ -47,32 +50,17 @@ func CreateTransaction(db *sql.DB, transaction *dto.TransactionInputDTO) error {
 		return err
 	}
 
-	if transaction.Tipo == "c" {
-		stmt, err = db.Prepare(queryCreditBalance)
-		if err != nil {
-			log.Printf("error on prepare statement: %v", err)
-			return err
-		}
-		defer stmt.Close()
+	stmt, err = db.Prepare(queryUpdateBalance)
+	if err != nil {
+		log.Printf("error on prepare statement: %v", err)
+		return err
+	}
+	defer stmt.Close()
 
-		_, err = stmt.Exec(transaction.Valor, transaction.ClienteID)
-		if err != nil {
-			log.Printf("error on query row: %v", err)
-			return err
-		}
-	} else {
-		stmt, err = db.Prepare(queryDebitBalance)
-		if err != nil {
-			log.Printf("error on prepare statement: %v", err)
-			return err
-		}
-		defer stmt.Close()
-
-		_, err = stmt.Exec(transaction.Valor, transaction.ClienteID)
-		if err != nil {
-			log.Printf("error on query row: %v", err)
-			return err
-		}
+	_, err = stmt.Exec(transaction.Valor, transaction.ClienteID)
+	if err != nil {
+		log.Printf("error on query row: %v", err)
+		return err
 	}
 
 	return nil
@@ -125,6 +113,11 @@ func GetLastTransactionsByUserId(db *sql.DB, id int64) ([]dto.LastTransaction, e
 			log.Printf("error on scan row: %v", err)
 			return nil, err
 		}
+
+		if transaction.Tipo == "d" {
+			transaction.Valor = transaction.Valor * -1
+		}
+
 		transactions = append(transactions, transaction)
 	}
 
