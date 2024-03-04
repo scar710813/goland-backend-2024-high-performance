@@ -14,7 +14,7 @@ func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao strin
 		return nil, err
 	}
 
-	if tipo == "d" && valor > (balance.Total+balance.Limit) {
+	if balance.Total+balance.Limit <= valor && tipo == "d" {
 		return nil, errors.New("saldo insuficiente")
 	}
 
@@ -28,15 +28,14 @@ func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao strin
 		return nil, err
 	}
 
-	var saldo int64
 	if tipo == "c" {
-		saldo = balance.Total + valor
+		balance.Total = balance.Total + valor
 	} else {
-		saldo = balance.Total - valor
+		balance.Total = balance.Total - valor
 	}
 
 	return &dto.TransactionOutputDTO{
 		Limite: balance.Limit,
-		Saldo:  saldo,
+		Saldo:  balance.Total,
 	}, nil
 }
