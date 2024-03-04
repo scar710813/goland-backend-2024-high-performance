@@ -7,7 +7,7 @@ import (
 )
 
 func TransactionValidator(value int64, tipo string, description string) (*dto.TransactionInputDTO, error) {
-	if value <= 0 {
+	if value < 1 {
 		return nil, errors.New("valor da transação precisa ser positivo")
 	}
 	if tipo != "c" && tipo != "d" {
