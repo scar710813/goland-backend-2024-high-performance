@@ -18,15 +18,14 @@ func NewTransactionUseCase(db *sql.DB, valor int64, tipo string, descricao strin
 		return nil, errors.New("saldo insuficiente")
 	}
 
-	err = database.CreateTransaction(db, &dto.TransactionInputDTO{
-		Valor:     valor,
-		Tipo:      tipo,
-		Descricao: descricao,
-		ClienteID: userId,
-	})
-	if err != nil {
-		return nil, err
-	}
+	go func() {
+		_ = database.CreateTransaction(db, &dto.TransactionInputDTO{
+			Valor:     valor,
+			Tipo:      tipo,
+			Descricao: descricao,
+			ClienteID: userId,
+		})
+	}()
 
 	if tipo == "c" {
 		balance.Total = balance.Total + valor
