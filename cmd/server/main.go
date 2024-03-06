@@ -15,8 +15,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	db.SetMaxOpenConns(10000)
-	db.SetMaxIdleConns(5000)
+	db.SetMaxOpenConns(20000)
+	db.SetMaxIdleConns(10000)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
