@@ -90,6 +90,24 @@ func GetBalanceAndLimitByUserId(db *sql.DB, userId int64) (*dto.Balance, error) 
 }
 
 func GetLastTransactionsByUserId(db *sql.DB, id int64) ([]dto.LastTransaction, error) {
+	_, err := db.Exec("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+	if err != nil {
+		log.Printf("error setting transaction isolation level: %v", err)
+		return nil, err
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		log.Printf("error starting transaction: %v", err)
+		return nil, err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			log.Printf("transaction rolled back: %v", err)
+		}
+	}()
+
 	query := "SELECT valor, tipo, descricao, realizado_em FROM transacoes WHERE cliente_id = ? ORDER BY realizado_em DESC LIMIT 10"
 
 	stmt, err := db.Prepare(query)
@@ -119,6 +137,12 @@ func GetLastTransactionsByUserId(db *sql.DB, id int64) ([]dto.LastTransaction, e
 		}
 
 		transactions = append(transactions, transaction)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		log.Printf("error committing transaction: %v", err)
+		return nil, err
 	}
 
 	return transactions, nil
