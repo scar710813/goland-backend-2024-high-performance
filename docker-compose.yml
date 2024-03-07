@@ -6,11 +6,6 @@ services:
     hostname: api01
     platform: linux/amd64
     restart: unless-stopped
-    ulimits:
-      nproc: 1000000
-      nofile:
-        soft: 1000000
-        hard: 1000000
     networks:
       - default
     environment:
