@@ -37,7 +37,24 @@ func CreateTransaction(db *sql.DB, transaction *dto.TransactionInputDTO) error {
 		transaction.Valor = transaction.Valor * -1
 	}
 
-	stmt, err := db.Prepare(query)
+	tx, err := db.Begin()
+	if err != nil {
+		log.Printf("error on begin transaction: %v", err)
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+		if err != nil {
+			log.Printf("error on commit transaction: %v", err)
+		}
+	}()
+
+	stmt, err := tx.Prepare(query)
 	if err != nil {
 		log.Printf("error on prepare statement: %v", err)
 		return err
@@ -50,7 +67,7 @@ func CreateTransaction(db *sql.DB, transaction *dto.TransactionInputDTO) error {
 		return err
 	}
 
-	stmt, err = db.Prepare(queryUpdateBalance)
+	stmt, err = tx.Prepare(queryUpdateBalance)
 	if err != nil {
 		log.Printf("error on prepare statement: %v", err)
 		return err
