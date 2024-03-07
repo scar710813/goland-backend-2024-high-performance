@@ -49,5 +49,5 @@ $ ./executar-teste-local.sh
 
 ## :incoming_envelope: Contact
 
-@kleytonsolinho - Twitter
+@kleytonsolinho - Twitter <br />
 kleytonsolinho@gmai.com - Email
