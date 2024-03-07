@@ -26,16 +26,18 @@
 
 
 ```bash
-# Clone this repository
 $ git clone git@github.com:kleytonsolinho/rinha-de-backend-2024-q1.git
+```
 
-# Go into the repository
+```bash
 $ cd rinha-de-backend-2024-q1
+```
 
-# Install dependencies
+```bash
 $ docker-compose up -d
+```
 
-# Run the app
+```bash
 $ ./executar-teste-local.sh
 ```
 
