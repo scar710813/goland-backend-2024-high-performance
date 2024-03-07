@@ -28,11 +28,11 @@
 
 
 ```bash
-$ git clone git@github.com:kleytonsolinho/rinha-de-backend-2024-q1.git
+$ git clone git@github.com:kleytonsolinho/rinha-de-backend-2024-q1-golang.git
 ```
 
 ```bash
-$ cd rinha-de-backend-2024-q1
+$ cd rinha-de-backend-2024-q1-golang
 ```
 
 ```bash
