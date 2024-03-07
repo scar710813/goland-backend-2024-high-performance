@@ -16,6 +16,8 @@
 ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
 
+<b>Repository:</b> [https://github.com/kleytonsolinho/rinha-de-backend-2024-q1](https://github.com/kleytonsolinho/rinha-de-backend-2024-q1)
+
 ## :information_source: How to run?
 
 ##### Pre-requisites:
